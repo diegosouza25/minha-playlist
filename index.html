@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playlist Diego</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<img src="diego lindo.jpeg" class="profile-img" alt="Foto de Diego">
+<h1>DIEGO SOUZA</h1>
+
+<p>Essa playlist é como uma trilha sonora dos meus dias — da calmaria à bagunça, da chuva ao sol.
+São músicas que falam comigo, e talvez falem com você também.</p>
+
+<p>Dá o play e entra no clima comigo. 🎧!</p>
+
+<button onclick="window.location.href='admin.html'">LOGIN ADMIN</button>
+
+<table id="playlist">
+  <thead>
+    <tr>
+      <th>TÍTULO</th>
+      <th>AUTOR</th>
+      <th>CAPA</th>
+      <th>ANO</th>
+      <th>SAIBA MAIS</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+async function carregarPlaylist() {
+  const res = await fetch("/api/musicas");
+  const musicas = await res.json();
+  const tbody = document.querySelector("#playlist tbody");
+  tbody.innerHTML = "";
+  musicas.forEach(m => {
+    tbody.innerHTML += `
+      <tr>
+        <td><a href="${m.linkMusica}" target="_blank">${m.titulo}</a></td>
+        <td>${m.autor}</td>
+        <td><img src="${m.linkCapa}" alt="${m.titulo}"></td>
+        <td>${m.ano}</td>
+        <td><a href="${m.linkWiki}" target="_blank">Link</a></td>
+      </tr>
+    `;
+  });
+}
+
+carregarPlaylist();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Playlist</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Administração 🎶</h1>
+
+<div id="login-container">
+  <input type="text" id="username" placeholder="Usuário">
+  <input type="password" id="password" placeholder="Senha">
+  <button id="loginBtn">Entrar</button>
+</div>
+
+<div id="form-container" style="display:none; flex-direction: column; align-items: center;">
+  <h2>Adicionar Música</h2>
+  <input type="text" id="titulo" placeholder="Título">
+  <input type="text" id="autor" placeholder="Autor">
+  <input type="url" id="linkMusica" placeholder="Link da música">
+  <input type="url" id="linkCapa" placeholder="Link da capa">
+  <input type="number" id="ano" placeholder="Ano">
+  <input type="url" id="linkWiki" placeholder="Link Wikipedia">
+  <button id="adicionarMusica">Adicionar Música</button>
+
+  <h2>Músicas cadastradas</h2>
+  <table id="tabelaAdmin">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>Capa</th>
+        <th>Ano</th>
+        <th>Wiki</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+const USUARIO = "diego";
+const SENHA = "1234";
+
+const formContainer = document.getElementById("form-container");
+const loginContainer = document.getElementById("login-container");
+const tabelaBody = document.querySelector("#tabelaAdmin tbody");
+
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  if(user === USUARIO && pass === SENHA) {
+    loginContainer.style.display = "none";
+    formContainer.style.display = "flex";
+    carregarTabela();
+  } else {
+    alert("Usuário ou senha incorretos!");
+  }
+});
+
+document.getElementById("adicionarMusica").addEventListener("click", async () => {
+  const novaMusica = {
+    titulo: document.getElementById("titulo").value,
+    autor: document.getElementById("autor").value,
+    linkMusica: document.getElementById("linkMusica").value,
+    linkCapa: document.getElementById("linkCapa").value,
+    ano: document.getElementById("ano").value,
+    linkWiki: document.getElementById("linkWiki").value
+  };
+
+  const res = await fetch("/api/musicas", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(novaMusica)
+  });
+
+  const data = await res.json();
+  if(data.success) {
+    alert("Música adicionada!");
+    document.querySelectorAll("#form-container input").forEach(i => i.value="");
+    carregarTabela();
+  } else {
+    alert("Erro ao adicionar música!");
+  }
+});
+
+async function carregarTabela() {
+  const res = await fetch("/api/musicas");
+  const musicas = await res.json();
+  tabelaBody.innerHTML = "";
+  musicas.forEach(m => {
+    tabelaBody.innerHTML += `
+      <tr>
+        <td>${m.titulo}</td>
+        <td>${m.autor}</td>
+        <td><img src="${m.linkCapa}" width="50"></td>
+        <td>${m.ano}</td>
+        <td><a href="${m.linkWiki}" target="_blank">Link</a></td>
+      </tr>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
